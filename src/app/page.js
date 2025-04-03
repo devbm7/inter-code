@@ -16,7 +16,7 @@ const OutputDisplay = dynamic(() => import('./components/OutputDisplay'), {
 });
 
 export default function Home() {
-  const [code, setCode] = useState('# Write your Python code here\nprint("Hello, World!")');
+  const [code, setCode] = useState('');
   const [output, setOutput] = useState('');
   const [error, setError] = useState('');
   const [isRunning, setIsRunning] = useState(false);
@@ -59,7 +59,7 @@ export default function Home() {
       
       <div className="code-environment">
         <div className="editor-pane">
-          <CodeEditor onCodeChange={setCode} />
+          <CodeEditor onCodeChange={setCode} initialCode="" />
         </div>
         <div className="output-pane">
           <OutputDisplay 

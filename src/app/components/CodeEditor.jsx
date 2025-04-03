@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import dynamic from 'next/dynamic';
 
 // Dynamically import CodeMirror with no SSR to prevent hydration issues
@@ -25,14 +25,32 @@ def hello_world():
 print(hello_world())
 `;
 
-const CodeEditor = ({ onCodeChange }) => {
-  const [code, setCode] = useState(defaultCode);
-
+const CodeEditor = ({ onCodeChange, initialCode }) => {
+  const [code, setCode] = useState(initialCode || defaultCode);
+  const [editorInstance, setEditorInstance] = useState(null);
+  
+  // Clear default code on first focus
+  const [hasBeenFocused, setHasBeenFocused] = useState(false);
+  
   const handleChange = (editor, data, value) => {
     setCode(value);
     if (onCodeChange) {
       onCodeChange(value);
     }
+  };
+  
+  const handleEditorDidMount = (editor) => {
+    setEditorInstance(editor);
+    
+    // Add focus handler to clear default code on first focus
+    editor.on('focus', () => {
+      if (!hasBeenFocused) {
+        setHasBeenFocused(true);
+        if (code === defaultCode) {
+          editor.setValue('');
+        }
+      }
+    });
   };
 
   const options = {
@@ -46,6 +64,16 @@ const CodeEditor = ({ onCodeChange }) => {
     styleActiveLine: true,
     tabSize: 4,
     indentWithTabs: false,
+    electricChars: false, // Disable auto-indentation with parentheses
+    extraKeys: {
+      "Tab": (cm) => {
+        if (cm.somethingSelected()) {
+          cm.indentSelection("add");
+        } else {
+          cm.replaceSelection("    ", "end");
+        }
+      }
+    }
   };
 
   return (
@@ -55,6 +83,7 @@ const CodeEditor = ({ onCodeChange }) => {
           value={code}
           options={options}
           onBeforeChange={handleChange}
+          editorDidMount={handleEditorDidMount}
           className="h-full"
         />
       )}
