@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import Navbar from './components/Navbar';
 
@@ -15,11 +15,24 @@ const OutputDisplay = dynamic(() => import('./components/OutputDisplay'), {
   loading: () => <div className="loading">Loading Output...</div>
 });
 
+// Define a starter code that will be used when the editor loads
+const starterCode = ``;
+
 export default function Home() {
-  const [code, setCode] = useState('');
+  const [code, setCode] = useState(starterCode);
   const [output, setOutput] = useState('');
   const [error, setError] = useState('');
   const [isRunning, setIsRunning] = useState(false);
+  const [isEditorMounted, setIsEditorMounted] = useState(false);
+
+  // Handle editor initialization
+  useEffect(() => {
+    setIsEditorMounted(true);
+  }, []);
+
+  const handleCodeChange = (newCode) => {
+    setCode(newCode);
+  };
 
   const handleRunCode = async () => {
     setIsRunning(true);
@@ -59,7 +72,12 @@ export default function Home() {
       
       <div className="code-environment">
         <div className="editor-pane">
-          <CodeEditor onCodeChange={setCode} initialCode="" />
+          {isEditorMounted && (
+            <CodeEditor 
+              onCodeChange={handleCodeChange} 
+              initialCode={starterCode} 
+            />
+          )}
         </div>
         <div className="output-pane">
           <OutputDisplay 

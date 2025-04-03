@@ -3,7 +3,7 @@ import React from 'react';
 const Navbar = ({ onRunCode, isRunning }) => {
   return (
     <nav className="navbar">
-      <div className="logo">CodeEnv</div>
+      <div className="logo">InterCode</div>
       <div className="actions">
         <button 
           className="run-button" 

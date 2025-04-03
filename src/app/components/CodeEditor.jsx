@@ -18,19 +18,26 @@ const CodeMirror = dynamic(
   { ssr: false }
 );
 
-const defaultCode = `# Write your Python code here
-def hello_world():
-    return "Hello, World!"
-
-print(hello_world())
-`;
+const defaultCode = ``;
 
 const CodeEditor = ({ onCodeChange, initialCode }) => {
   const [code, setCode] = useState(initialCode || defaultCode);
   const [editorInstance, setEditorInstance] = useState(null);
+  const [hasInitialized, setHasInitialized] = useState(false);
   
-  // Clear default code on first focus
-  const [hasBeenFocused, setHasBeenFocused] = useState(false);
+  useEffect(() => {
+    // When component mounts, update the initialized state
+    setHasInitialized(true);
+  }, []);
+
+  useEffect(() => {
+    // Only set initial code when it changes and after editor is initialized
+    if (editorInstance && initialCode && !hasInitialized) {
+      setCode(initialCode);
+      editorInstance.setValue(initialCode);
+      setHasInitialized(true);
+    }
+  }, [initialCode, editorInstance, hasInitialized]);
   
   const handleChange = (editor, data, value) => {
     setCode(value);
@@ -42,13 +49,12 @@ const CodeEditor = ({ onCodeChange, initialCode }) => {
   const handleEditorDidMount = (editor) => {
     setEditorInstance(editor);
     
-    // Add focus handler to clear default code on first focus
-    editor.on('focus', () => {
-      if (!hasBeenFocused) {
-        setHasBeenFocused(true);
-        if (code === defaultCode) {
-          editor.setValue('');
-        }
+    // Fix for cursor position issue after typing parentheses
+    editor.on('keyHandled', (cm, name, event) => {
+      // Ensure cursor position is correct after auto-pairing brackets
+      if (name === ')' || name === '}' || name === ']' || name === '(' || name === '{' || name === '[') {
+        const cursor = cm.getCursor();
+        cm.setCursor(cursor+1);
       }
     });
   };
@@ -64,7 +70,8 @@ const CodeEditor = ({ onCodeChange, initialCode }) => {
     styleActiveLine: true,
     tabSize: 4,
     indentWithTabs: false,
-    electricChars: false, // Disable auto-indentation with parentheses
+    electricChars: true, // Enable auto-indentation
+    autofocus: true, // Focus the editor on load
     extraKeys: {
       "Tab": (cm) => {
         if (cm.somethingSelected()) {
@@ -85,6 +92,8 @@ const CodeEditor = ({ onCodeChange, initialCode }) => {
           onBeforeChange={handleChange}
           editorDidMount={handleEditorDidMount}
           className="h-full"
+          // Add preserveScrollPosition to maintain cursor position
+          preserveScrollPosition={true}
         />
       )}
       <style jsx>{`
@@ -100,6 +109,16 @@ const CodeEditor = ({ onCodeChange, initialCode }) => {
           height: 100%;
           font-size: 14px;
           font-family: 'Fira Code', monospace;
+        }
+        
+        /* Ensure cursor is visible */
+        :global(.CodeMirror-cursor) {
+          border-left: 2px solid white !important;
+        }
+        
+        /* Fix focus issues */
+        :global(.CodeMirror-focused) {
+          outline: none;
         }
       `}</style>
     </div>

@@ -80,6 +80,7 @@ async function executePythonCode(filePath) {
     // Collect stderr
     process.stderr.on('data', (data) => {
       error += data.toString();
+      error = error.replace("C:\\Users\\devma\\AppData\\Local\\Temp\\", ""); // Remove temp path from error message
     });
 
     // Handle process completion
