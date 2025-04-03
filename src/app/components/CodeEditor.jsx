@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import dynamic from 'next/dynamic';
 
-// Dynamically import CodeMirror with no SSR to prevent hydration issue
+// Dynamically import CodeMirror with no SSR to prevent hydration issues
 const CodeMirror = dynamic(
   () => {
     import('codemirror/mode/python/python');
