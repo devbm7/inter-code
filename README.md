@@ -34,3 +34,27 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+
+
+# Project Structure
+
+python-code-editor/
+├── app/
+│   ├── api/
+│   │   └── execute/
+│   │       └── route.js     # API endpoint for code execution
+│   ├── components/
+│   │   ├── CodeEditor.jsx   # Code editor component
+│   │   ├── OutputDisplay.jsx # Output display component
+│   │   └── Navbar.jsx       # Navigation bar
+│   ├── layout.js            # Root layout
+│   ├── page.js              # Main page
+│   └── globals.css          # Global styles
+├── lib/
+│   └── pythonRunner.js      # Utility to handle Python execution
+├── public/
+│   └── ...                  # Static assets
+├── .env                     # Environment variables
+├── next.config.js           # Next.js configuration
+├── package.json             # Dependencies
+└── README.md                # Project documentation
